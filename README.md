@@ -15,9 +15,9 @@ A macOS menu bar app for monitoring your Claude Max plan usage limits.
 - **Reset Notifications** - Know when your limits reset
 - **Dark Theme** - Matches Claude's UI design
 
-## Screenshots
+## Screenshot
 
-*Coming soon*
+![Jessep Usage Popover](jessep-screenshot.png)
 
 ## Installation
 
