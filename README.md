@@ -115,7 +115,7 @@ xcodebuild test -scheme Jessep -destination 'platform=macOS'
 
 ### Why "Jessep"?
 
-It's a play on "usage" - like "check your usage" became "Jessep" (just check).
+"Son, we live in a world that has tokens, and those tokens have to be guarded by men with guns." - Lt. Colonel Jessep. in "A Few Good Men"
 
 ### Is this official?
 
