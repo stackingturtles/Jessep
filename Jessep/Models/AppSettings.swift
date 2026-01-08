@@ -20,6 +20,8 @@ class AppSettings: ObservableObject {
 
     @AppStorage("alertOnReset") var alertOnReset = true
 
+    @AppStorage("hasShownSplash") var hasShownSplash = false
+
     private init() {
         // Sync launch at login state on init
         if LaunchAtLoginManager.isEnabled != launchAtLogin {

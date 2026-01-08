@@ -132,6 +132,9 @@ struct AuthenticationSettingsView: View {
     @State private var manualToken = ""
     @State private var saveError: String?
     @State private var showClearConfirmation = false
+    @State private var isRefreshing = false
+    @State private var refreshError: String?
+    @State private var showRefreshSuccess = false
 
     var body: some View {
         Form {
@@ -149,6 +152,40 @@ struct AuthenticationSettingsView: View {
                     case .none:
                         Label("Not Found", systemImage: "xmark.circle.fill")
                             .foregroundColor(.red)
+                    }
+                }
+
+                if tokenSource == .claudeCode {
+                    VStack(alignment: .leading, spacing: 8) {
+                        Button(action: refreshTokenFromKeychain) {
+                            HStack {
+                                if isRefreshing {
+                                    ProgressView()
+                                        .scaleEffect(0.8)
+                                        .frame(width: 16, height: 16)
+                                } else {
+                                    Image(systemName: "arrow.clockwise")
+                                }
+                                Text("Refresh Token from Keychain")
+                            }
+                        }
+                        .disabled(isRefreshing)
+
+                        if let error = refreshError {
+                            Text(error)
+                                .font(.caption)
+                                .foregroundColor(.red)
+                        }
+
+                        if showRefreshSuccess {
+                            Text("Token refreshed successfully")
+                                .font(.caption)
+                                .foregroundColor(.green)
+                        }
+
+                        Text("This will prompt you to enter your macOS keychain password to re-authorise access to the Claude Code token.")
+                            .font(.caption)
+                            .foregroundColor(.secondary)
                     }
                 }
             }
@@ -233,16 +270,56 @@ struct AuthenticationSettingsView: View {
         try? KeychainService.deleteManualToken()
         tokenSource = KeychainService.tokenSource()
     }
+
+    private func refreshTokenFromKeychain() {
+        isRefreshing = true
+        refreshError = nil
+        showRefreshSuccess = false
+
+        Task {
+            do {
+                // Force keychain authentication
+                _ = try KeychainService.refreshClaudeCodeToken()
+
+                // Update token source
+                await MainActor.run {
+                    tokenSource = KeychainService.tokenSource()
+                    showRefreshSuccess = true
+                    isRefreshing = false
+                }
+
+                // Auto-hide success message after 3 seconds
+                try? await Task.sleep(nanoseconds: 3_000_000_000)
+                await MainActor.run {
+                    showRefreshSuccess = false
+                }
+            } catch {
+                await MainActor.run {
+                    refreshError = error.localizedDescription
+                    isRefreshing = false
+                }
+            }
+        }
+    }
 }
 
 // MARK: - About Settings
 
 struct AboutSettingsView: View {
     var body: some View {
-        VStack(spacing: 20) {
-            Image(systemName: "chart.bar.fill")
-                .font(.system(size: 48))
-                .foregroundColor(.claudeProgressBar)
+        VStack(spacing: 16) {
+            // App icon
+            if let image = NSImage(named: "AppIcon") {
+                Image(nsImage: image)
+                    .resizable()
+                    .aspectRatio(contentMode: .fit)
+                    .frame(width: 120, height: 120)
+                    .shadow(color: .black.opacity(0.2), radius: 10, x: 0, y: 5)
+            } else {
+                Image(systemName: "chart.bar.fill")
+                    .font(.system(size: 48))
+                    .foregroundColor(.claudeProgressBar)
+            }
 
             Text(AppInfo.name)
                 .font(.title)
@@ -251,7 +328,24 @@ struct AboutSettingsView: View {
             Text("Version \(AppInfo.fullVersion)")
                 .foregroundColor(.secondary)
 
+            // Quote section
+            VStack(spacing: 8) {
+                Text("\"Son, we live in a world that has tokens, and those tokens have to be guarded by men with guns.\"")
+                    .font(.system(size: 12, weight: .medium, design: .serif))
+                    .foregroundColor(.secondary)
+                    .multilineTextAlignment(.center)
+                    .lineSpacing(2)
+                    .italic()
+
+                Text("— Lt. Colonel Jessep")
+                    .font(.system(size: 11, weight: .semibold, design: .serif))
+                    .foregroundColor(.secondary.opacity(0.8))
+            }
+            .padding(.horizontal, 20)
+            .padding(.vertical, 8)
+
             Text("A macOS menu bar app for monitoring your Claude Max plan usage limits.")
+                .font(.system(size: 12))
                 .multilineTextAlignment(.center)
                 .foregroundColor(.secondary)
                 .padding(.horizontal)

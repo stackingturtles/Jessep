@@ -116,4 +116,19 @@ class UsageViewModel: ObservableObject {
     var lastRefreshFormatted: String {
         DateFormatters.formatRelativeTime(from: lastRefresh)
     }
+
+    // MARK: - Token Management
+
+    /// Refresh the token from keychain with forced authentication and update usage data
+    func refreshToken() async throws {
+        // Force keychain authentication
+        _ = try KeychainService.refreshClaudeCodeToken()
+
+        // Clear any previous errors
+        error = nil
+        isOffline = false
+
+        // Refresh usage data with the newly authenticated token
+        await refresh()
+    }
 }

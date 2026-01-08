@@ -7,6 +7,8 @@ enum KeychainError: LocalizedError {
     case unexpectedError(OSStatus)
     case saveFailed(OSStatus)
     case deleteFailed(OSStatus)
+    case authenticationCancelled
+    case authenticationFailed
 
     var errorDescription: String? {
         switch self {
@@ -20,6 +22,10 @@ enum KeychainError: LocalizedError {
             return "Failed to save token: \(status)"
         case .deleteFailed(let status):
             return "Failed to delete token: \(status)"
+        case .authenticationCancelled:
+            return "Authentication was cancelled"
+        case .authenticationFailed:
+            return "Failed to authenticate with keychain"
         }
     }
 }
@@ -82,6 +88,51 @@ struct KeychainService {
 
     static func hasClaudeCodeToken() -> Bool {
         (try? getClaudeCodeToken()) != nil
+    }
+
+    // MARK: - Force Re-authentication
+
+    /// Force keychain to re-prompt for password by requesting authentication
+    static func refreshClaudeCodeToken() throws -> String {
+        print("[Jessep] KeychainService.refreshClaudeCodeToken() called - forcing authentication")
+
+        let query: [String: Any] = [
+            kSecClass as String: kSecClassGenericPassword,
+            kSecAttrService as String: claudeCodeService,
+            kSecReturnData as String: true,
+            kSecMatchLimit as String: kSecMatchLimitOne,
+            kSecUseAuthenticationUI as String: kSecUseAuthenticationUIAllow,
+            kSecUseOperationPrompt as String: "Jessep needs to refresh your Claude token"
+        ]
+
+        var result: AnyObject?
+        let status = SecItemCopyMatching(query as CFDictionary, &result)
+
+        if status == errSecUserCanceled {
+            print("[Jessep] User cancelled authentication")
+            throw KeychainError.authenticationCancelled
+        }
+
+        guard status == errSecSuccess else {
+            print("[Jessep] Authentication failed with status: \(status)")
+            if status == errSecItemNotFound {
+                throw KeychainError.tokenNotFound
+            }
+            throw KeychainError.authenticationFailed
+        }
+
+        guard let data = result as? Data else {
+            throw KeychainError.invalidData
+        }
+
+        guard let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
+              let oauth = json["claudeAiOauth"] as? [String: Any],
+              let token = oauth["accessToken"] as? String else {
+            throw KeychainError.invalidData
+        }
+
+        print("[Jessep] Successfully retrieved token after authentication")
+        return token
     }
 
     // MARK: - Manual Token

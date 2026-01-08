@@ -50,5 +50,6 @@ enum AppInfo {
 enum AppLinks {
     static let usageDocs = URL(string: "https://support.claude.com/en/articles/11647753-understanding-usage-and-length-limits")!
     static let claudeAI = URL(string: "https://claude.ai")!
+    static let claudeUsage = URL(string: "https://claude.ai/settings/usage")!
     static let github = URL(string: "https://github.com/stackingturtles/jessep")!
 }

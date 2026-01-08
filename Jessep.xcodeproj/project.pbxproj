@@ -27,6 +27,7 @@
 		A10000000000000000000018 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000018 /* SettingsView.swift */; };
 		A10000000000000000000019 /* TokenEntryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000019 /* TokenEntryView.swift */; };
 		A10000000000000000000020 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000020 /* Assets.xcassets */; };
+		E7CD6022163C4CF2916F0D46 /* SplashScreenView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A66CC532DDF54C04A8AB36A1 /* SplashScreenView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -53,6 +54,7 @@
 		A20000000000000000000021 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		A20000000000000000000022 /* Jessep.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Jessep.entitlements; sourceTree = "<group>"; };
 		A30000000000000000000001 /* Jessep.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Jessep.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		A66CC532DDF54C04A8AB36A1 /* SplashScreenView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SplashScreenView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -106,7 +108,7 @@
 				A20000000000000000000017 /* ErrorView.swift */,
 				A20000000000000000000018 /* SettingsView.swift */,
 				A20000000000000000000019 /* TokenEntryView.swift */,
-			);
+				A66CC532DDF54C04A8AB36A1 /* SplashScreenView.swift */,);
 			path = Views;
 			sourceTree = "<group>";
 		};
@@ -247,7 +249,7 @@
 				A10000000000000000000017 /* ErrorView.swift in Sources */,
 				A10000000000000000000018 /* SettingsView.swift in Sources */,
 				A10000000000000000000019 /* TokenEntryView.swift in Sources */,
-			);
+				E7CD6022163C4CF2916F0D46 /* SplashScreenView.swift in Sources */,);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */

@@ -9,11 +9,17 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     private var cancellables = Set<AnyCancellable>()
     private var settingsWindow: NSWindow?
     private var popoverWindow: NSPanel?
+    private var splashWindow: NSWindow?
 
     func applicationDidFinishLaunching(_ notification: Notification) {
         print("[Jessep] ========================================")
         print("[Jessep] applicationDidFinishLaunching started")
         print("[Jessep] ========================================")
+
+        // Show splash screen on first launch
+        if !AppSettings.shared.hasShownSplash {
+            showSplashScreen()
+        }
 
         // Observe settings open request
         NotificationCenter.default.addObserver(
@@ -259,6 +265,40 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         }
 
         button.toolTip = "Claude usage at \(Int(maxUsage))%"
+    }
+
+    // MARK: - Splash Screen
+
+    private func showSplashScreen() {
+        print("[Jessep] showSplashScreen called")
+
+        let splashView = SplashScreenView(isPresented: .init(
+            get: { self.splashWindow != nil },
+            set: { presenting in
+                if !presenting {
+                    self.splashWindow?.close()
+                    self.splashWindow = nil
+                    AppSettings.shared.hasShownSplash = true
+                    print("[Jessep] Splash screen dismissed")
+                }
+            }
+        ))
+
+        let hostingController = NSHostingController(rootView: splashView)
+
+        let window = NSWindow(contentViewController: hostingController)
+        window.styleMask = [.borderless, .fullSizeContentView]
+        window.isOpaque = false
+        window.backgroundColor = .clear
+        window.level = .floating
+        window.hasShadow = true
+        window.setContentSize(NSSize(width: 600, height: 500))
+        window.center()
+        window.isReleasedWhenClosed = false
+
+        splashWindow = window
+        window.makeKeyAndOrderFront(nil)
+        NSApp.activate(ignoringOtherApps: true)
     }
 
     // MARK: - Settings Window

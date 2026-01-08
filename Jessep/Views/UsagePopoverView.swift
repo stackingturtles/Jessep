@@ -226,23 +226,15 @@ struct UsagePopoverView: View {
 
             Spacer()
 
-            // Settings button
-            OpenSettingsButton {
-                HStack(spacing: 4) {
-                    Image(systemName: "gearshape")
-                        .font(.system(size: 11))
-                    Text("Settings")
-                        .font(.system(size: 11))
+            // Claude Usage link
+            Link(destination: AppLinks.claudeUsage) {
+                HStack(spacing: 2) {
+                    Text("Claude Usage")
+                        .font(.system(size: 10))
+                    Image(systemName: "arrow.up.right")
+                        .font(.system(size: 8))
                 }
-                .foregroundColor(.claudeTextSecondary)
-            }
-            .buttonStyle(.plain)
-            .onHover { hovering in
-                if hovering {
-                    NSCursor.pointingHand.push()
-                } else {
-                    NSCursor.pop()
-                }
+                .foregroundColor(.claudeProgressBar)
             }
         }
         .padding(.horizontal, 16)
